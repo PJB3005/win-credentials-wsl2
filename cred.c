@@ -3,6 +3,7 @@
 #include "Windows.h"
 #include "wincred.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 int main(int argc, const char* argv[]) {
     if (argc < 2) {
@@ -37,6 +38,12 @@ int main(int argc, const char* argv[]) {
         return 1;
     }
 
-    fwrite(credential->CredentialBlob, 1, credential->CredentialBlobSize, stdout);
+    int length = WideCharToMultiByte(CP_UTF8, 0, (LPWCH) credential->CredentialBlob, credential->CredentialBlobSize / 2, NULL, 0, NULL, NULL);
+    char* buf = malloc(length);
+    WideCharToMultiByte(CP_UTF8, 0, (LPWCH) credential->CredentialBlob, credential->CredentialBlobSize / 2, buf, length, NULL, NULL);
+
+    fwrite(buf, 1, length, stdout);
+    fwrite("\n", 1, 1, stdout);
+    fflush(stdout);
     return 0;
 }
